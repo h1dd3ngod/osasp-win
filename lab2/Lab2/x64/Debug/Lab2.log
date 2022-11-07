@@ -1,0 +1,3 @@
+﻿  Lab2.cpp
+D:\_semester5\osasp_win\Lab2\Lab2.cpp(250,1): warning C4312: 'type cast': conversion from 'int' to 'HMENU' of greater size
+  Lab2.vcxproj -> D:\_semester5\osasp_win\x64\Debug\Lab2.exe
