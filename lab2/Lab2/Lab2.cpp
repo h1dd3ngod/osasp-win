@@ -11,15 +11,15 @@
 
 
 #define MAX_LOADSTRING 100
-#define COUNT_OF_COLUMNS 7
-#define COUNT_OF_ROWS 5
+#define COLUMN_COUNT 7
+#define ROW_COUNT 5
 
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-HWND textTable[COUNT_OF_ROWS][COUNT_OF_COLUMNS]; // table of EditBoxes
+HWND textTable[ROW_COUNT][COLUMN_COUNT]; // table of EditBoxes
 const int defaultHeight = 15;
 int positionOfScroll = 0;
 
@@ -126,7 +126,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    SCROLLINFO scrollInfo;
    scrollInfo.nPos = 0;
    scrollInfo.nMin = 0;
-   scrollInfo.nMax = COUNT_OF_ROWS - 1;
+   scrollInfo.nMax = ROW_COUNT - 1;
    scrollInfo.nPage = 1;
    scrollInfo.fMask = SIF_ALL;
 
@@ -227,10 +227,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 void createTable(HWND hwnd,int width,int height) {
-    int widthOfElement = width / COUNT_OF_COLUMNS;
+    int widthOfElement = width / COLUMN_COUNT;
     int heightOfElement = defaultHeight * 2;
-    for (int i = 0; i < COUNT_OF_ROWS; i++) {
-        for (int j = 0; j < COUNT_OF_COLUMNS; j++) {
+    for (int i = 0; i < ROW_COUNT; i++) {
+        for (int j = 0; j < COLUMN_COUNT; j++) {
             addEditBox(hwnd, i, j, widthOfElement, heightOfElement);
         }
     }
@@ -252,7 +252,7 @@ void addEditBox(HWND hwnd, int rowIndex, int columnIndex, int width, int height)
 
 int getLastLine(HWND textTableRow[]) {
     int lastLine = (int)SendMessage(textTableRow[0], EM_GETLINECOUNT, NULL, NULL);
-    for (int i = 0; i < COUNT_OF_COLUMNS; i++) {
+    for (int i = 0; i < COLUMN_COUNT; i++) {
         int tempLine = (int)SendMessage(textTableRow[i], EM_GETLINECOUNT, NULL, NULL);
         if (tempLine > lastLine) {
             lastLine = tempLine;
@@ -262,13 +262,13 @@ int getLastLine(HWND textTableRow[]) {
 }
 
 void updateTable(HWND hwnd, int width, int height) {
-    int widthOfElement = width / COUNT_OF_COLUMNS;
+    int widthOfElement = width / COLUMN_COUNT;
     int heightOfElement;
     int y = 0;
-    for (int i = 0; i < COUNT_OF_ROWS; i++) {
+    for (int i = 0; i < ROW_COUNT; i++) {
         int lastLine = getLastLine(textTable[i]);  
         heightOfElement = defaultHeight * (lastLine + 1);
-        for (int j = 0; j < COUNT_OF_COLUMNS; j++) {
+        for (int j = 0; j < COLUMN_COUNT; j++) {
             int x = j * widthOfElement;
             MoveWindow(textTable[i][j], x, y - positionOfScroll, widthOfElement, heightOfElement, TRUE);
         }
@@ -277,8 +277,8 @@ void updateTable(HWND hwnd, int width, int height) {
 }
 
 void destroyTable(HWND hwnd) {
-    for (int i = 0; i < COUNT_OF_ROWS; i++) {
-        for (int j = 0; j < COUNT_OF_COLUMNS; j++) {
+    for (int i = 0; i < ROW_COUNT; i++) {
+        for (int j = 0; j < COLUMN_COUNT; j++) {
             DestroyWindow(textTable[i][j]);
         }
     }
