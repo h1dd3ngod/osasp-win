@@ -151,28 +151,28 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     RECT rect;
-    static int winWidth, winHeight;
+    static int windowWidth, windowHeight;
     static char sym;
     switch (message)
     {
     case WM_CREATE:
         GetClientRect(hWnd, &rect);
-        winWidth = rect.right - rect.left;
-        winHeight = rect.bottom - rect.top;
-        createTable(hWnd, winWidth, winHeight);
+        windowWidth = rect.right - rect.left;
+        windowHeight = rect.bottom - rect.top;
+        createTable(hWnd, windowWidth, windowHeight);
         break;
     case WM_SIZE:
         GetClientRect(hWnd, &rect);
-        winWidth = rect.right - rect.left;
-        winHeight = rect.bottom - rect.top;
-        updateTable(hWnd, winWidth, winHeight);
+        windowWidth = rect.right - rect.left;
+        windowHeight = rect.bottom - rect.top;
+        updateTable(hWnd, windowWidth, windowHeight);
         InvalidateRect(hWnd, NULL, 0);
         break;
     case WM_COMMAND:
         if (HIWORD(wParam) == EN_CHANGE) 
         {
             InvalidateRect(hWnd, NULL, 0);
-            updateTable(hWnd, winWidth, winHeight);
+            updateTable(hWnd, windowWidth, windowHeight);
         }
         break;
     case WM_VSCROLL: 
@@ -198,7 +198,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         if (scrollInfo.nPos != currPosition) {
             positionOfScroll = getRowsHeight(currPosition);
-            updateTable(hWnd,winWidth,winHeight);
+            updateTable(hWnd,windowWidth,windowHeight);
             SetScrollPos(hWnd, SB_VERT, currPosition, TRUE);
         }
         break;
@@ -227,23 +227,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 void createTable(HWND hwnd,int width,int height) {
-    int widthOfElement = width / COLUMN_COUNT;
-    int heightOfElement = defaultHeight * 2;
+    int cellWidth = width / COLUMN_COUNT;
+    int cellHeight = defaultHeight * 2;
     for (int i = 0; i < ROW_COUNT; i++) {
         for (int j = 0; j < COLUMN_COUNT; j++) {
-            addEditBox(hwnd, i, j, widthOfElement, heightOfElement);
+            addEditBox(hwnd, i, j, cellWidth, cellHeight);
         }
     }
 }
 
 void addEditBox(HWND hwnd, int rowIndex, int columnIndex, int width, int height) {
     int id = (rowIndex >> 16) | columnIndex;
-    int XCoord = width * columnIndex;
-    int YCoord = height * rowIndex;
+    int xCoord = width * columnIndex;
+    int yCoord = height * rowIndex;
     textTable[rowIndex][columnIndex] = CreateWindow(L"EDIT",
         0,
         WS_BORDER | WS_CLIPSIBLINGS | WS_CHILDWINDOW | WS_VISIBLE | ES_AUTOVSCROLL | ES_MULTILINE | ES_WANTRETURN,
-        XCoord, YCoord, width, height,
+        xCoord, yCoord, width, height,
         hwnd,
         (HMENU)id,
         (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
@@ -252,7 +252,7 @@ void addEditBox(HWND hwnd, int rowIndex, int columnIndex, int width, int height)
 
 int getLastLine(HWND textTableRow[]) {
     int lastLine = (int)SendMessage(textTableRow[0], EM_GETLINECOUNT, NULL, NULL);
-    for (int i = 0; i < COLUMN_COUNT; i++) {
+    for (int i = 1; i < COLUMN_COUNT; i++) {
         int tempLine = (int)SendMessage(textTableRow[i], EM_GETLINECOUNT, NULL, NULL);
         if (tempLine > lastLine) {
             lastLine = tempLine;
@@ -262,17 +262,17 @@ int getLastLine(HWND textTableRow[]) {
 }
 
 void updateTable(HWND hwnd, int width, int height) {
-    int widthOfElement = width / COLUMN_COUNT;
-    int heightOfElement;
+    int cellWidth = width / COLUMN_COUNT;
+    int cellHeight;
     int y = 0;
     for (int i = 0; i < ROW_COUNT; i++) {
         int lastLine = getLastLine(textTable[i]);  
-        heightOfElement = defaultHeight * (lastLine + 1);
+        cellHeight = defaultHeight * (lastLine + 1);
         for (int j = 0; j < COLUMN_COUNT; j++) {
-            int x = j * widthOfElement;
-            MoveWindow(textTable[i][j], x, y - positionOfScroll, widthOfElement, heightOfElement, TRUE);
+            int x = j * cellWidth;
+            MoveWindow(textTable[i][j], x, y - positionOfScroll, cellWidth, cellHeight, TRUE);
         }
-        y += heightOfElement;
+        y += cellHeight;
     }
 }
 
