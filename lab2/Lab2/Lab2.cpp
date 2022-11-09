@@ -12,7 +12,7 @@
 
 #define MAX_LOADSTRING 100
 #define COLUMN_COUNT 7
-#define ROW_COUNT 5
+#define ROW_COUNT 15
 
 
 // Global Variables:
@@ -207,9 +207,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         MINMAXINFO* pInfo = (MINMAXINFO*)lParam;
         POINT Min = { 200, 200 };
-        POINT  Max = { 800, 800 };
         pInfo->ptMinTrackSize = Min; 
-        pInfo->ptMaxTrackSize = Max; 
         return 0;
     }
     case WM_CLOSE:
