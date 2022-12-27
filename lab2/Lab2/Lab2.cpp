@@ -1,13 +1,13 @@
-// Lab2.cpp : Defines the entry point for the application.
-//
-
-#include "framework.h"
-#include "Lab2.h"
-/*#include <windows.h>
-#include <windowsx.h>
-#include <stdio.h>
-#include <commctrl.h>
-#include <tchar.h>*/
+#include "targetver.h"
+#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+// Windows Header Files
+#include <windows.h>
+// C RunTime Header Files
+#include <stdlib.h>
+#include <malloc.h>
+#include <memory.h>
+#include <tchar.h>
+#include "resource.h"
 
 
 #define MAX_LOADSTRING 100
@@ -19,8 +19,8 @@
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-HWND textTable[ROW_COUNT][COLUMN_COUNT]; // table of EditBoxes
-const int defaultHeight = 15;
+HWND textTable[ROW_COUNT][COLUMN_COUNT];        // table of EditBoxes
+const int defaultHeight = 18;
 int positionOfScroll = 0;
 
 // Forward declarations of functions included in this code module:
@@ -30,7 +30,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 void createTable(HWND, int, int);
-void updateTable(HWND, int, int);
+void redrawTable(HWND, int, int);
 void destroyTable(HWND);
 void addEditBox(HWND, int, int, int, int);
 int getLastLine(HWND);
@@ -43,8 +43,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-
-    // TODO: Place code here.
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -102,16 +100,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     return RegisterClassExW(&wcex);
 }
 
-//
-//   FUNCTION: InitInstance(HINSTANCE, int)
-//
-//   PURPOSE: Saves instance handle and creates main window
-//
-//   COMMENTS:
-//
-//        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
-//
+
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable
@@ -138,16 +127,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE: Processes messages for the main window.
-//
-//  WM_COMMAND  - process the application menu
-//  WM_PAINT    - Paint the main window
-//  WM_DESTROY  - post a quit message and return
-//
-//
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     RECT rect;
@@ -165,14 +145,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         GetClientRect(hWnd, &rect);
         windowWidth = rect.right - rect.left;
         windowHeight = rect.bottom - rect.top;
-        updateTable(hWnd, windowWidth, windowHeight);
+        redrawTable(hWnd, windowWidth, windowHeight);
         InvalidateRect(hWnd, NULL, 0);
         break;
     case WM_COMMAND:
         if (HIWORD(wParam) == EN_CHANGE) 
         {
             InvalidateRect(hWnd, NULL, 0);
-            updateTable(hWnd, windowWidth, windowHeight);
+            redrawTable(hWnd, windowWidth, windowHeight);
         }
         break;
     case WM_VSCROLL: 
@@ -198,7 +178,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         if (scrollInfo.nPos != currPosition) {
             positionOfScroll = getRowsHeight(currPosition);
-            updateTable(hWnd,windowWidth,windowHeight);
+            redrawTable(hWnd,windowWidth,windowHeight);
             SetScrollPos(hWnd, SB_VERT, currPosition, TRUE);
         }
         break;
@@ -259,13 +239,13 @@ int getLastLine(HWND textTableRow[]) {
     return lastLine;
 }
 
-void updateTable(HWND hwnd, int width, int height) {
+void redrawTable(HWND hwnd, int width, int height) {
     int cellWidth = width / COLUMN_COUNT;
     int cellHeight;
     int y = 0;
     for (int i = 0; i < ROW_COUNT; i++) {
-        int lastLine = getLastLine(textTable[i]);  
-        cellHeight = defaultHeight * (lastLine + 1);
+        int numberOfLines = getLastLine(textTable[i]);  
+        cellHeight = defaultHeight + (numberOfLines*16);
         for (int j = 0; j < COLUMN_COUNT; j++) {
             int x = j * cellWidth;
             MoveWindow(textTable[i][j], x, y - positionOfScroll, cellWidth, cellHeight, TRUE);
